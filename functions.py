@@ -46,6 +46,7 @@ def generador_de_cuerpos(cantidadDeCuerpos):
         aceleracion = np.array([valor_aleatorio(minimo, maximo), valor_aleatorio(minimo, maximo)])
         masa = valor_aleatorio(0, 30)
         cuerpo(posicion, velocidad, aceleracion, masa)
+
         posiciones.append(posicion)
         velocidades.append(velocidad)
         aceleraciones.append(aceleracion)
@@ -54,10 +55,16 @@ def generador_de_cuerpos(cantidadDeCuerpos):
     return listaDeCuerpos
 
 
+"""
+    Retorna las posiciones de los diferentes cuerpos.
+"""
 def obtener_posicion_de_cuerpos():
     return posiciones
 
 
+"""
+    Ejecuta todo.
+"""
 def core():
     cantidadDeCuerpos = pedir_datos("¿Cuántos cuerpos deseas?\n")
     LIMITE_DE_GRAFICACION = float(pedir_datos("Dame una escala de graficación, por favor\n"))
@@ -68,12 +75,20 @@ def core():
     
     posi = np.array(obtener_posicion_de_cuerpos())
 
-    t=0 #Instante inicial 
+    t=0 
+    #Instante inicial 
     plt.close()
     fig, ax= plt.subplots()  
+
+    # Set x axis label.
+    plt.xlabel("Eje X", fontsize=10)
+
+    # Set y axis label.
+    plt.ylabel("Eje Y", fontsize=10)
+
     """Mi grafica tendra un eje coordenado que se define como ax""" 
 
-    pl1,= ax.plot(np.array(posi)[:,0], np.array(posi)[:,1],'go')    
+    pl1,= ax.plot(np.array(posi)[:,0], np.array(posi)[:,1],'go')
 
     """con este codigo lo que quiero decir es: que en mi eje coordonado me
     grafique mis planetas mostrandomelos todos en la posicion x con [:,0]
@@ -89,45 +104,35 @@ def core():
     
     ax.set_xlim(min(np.array(posi)[:,0])-inx*LIMITE_DE_GRAFICACION,max(np.array(posi)[:,0])+inx*LIMITE_DE_GRAFICACION)   
     ax.set_ylim(min(np.array(posi)[:,1])-iny*LIMITE_DE_GRAFICACION, max(np.array(posi)[:,1])+iny*LIMITE_DE_GRAFICACION)                                                               
-
+    masas[0] = 5000000
     while t<400:
         for i in range(len(cuerpos)):
             posicionesAuxiliar = posiciones.copy()
             aceleracionesAuxiliar = aceleraciones.copy()
             masasAuxiliar = masas.copy()
 
-            """cuerpo_actual = cuerpos[i]
-            otros = cuerpos.copy()
-            otros.pop(i)
-            """
             posicionesAuxiliar.pop(i)
             aceleracionesAuxiliar.pop(i)
             masasAuxiliar.pop(i)
 
             for otro_cuerpo in range(len(posicionesAuxiliar)):
                 dj = posicionesAuxiliar[otro_cuerpo] - posiciones[i]
-                #dj = otro_cuerpo.pos - cuerpo_actual.pos #Distancia entre los cuerpos a interactuar"""
                 ndj = np.linalg.norm(dj) #Norma del vector entre la interaccion con cada cuerpo"""
 
-                # term = G*otro_cuerpo.masa*dj/((ndj)**3.0)
                 term = G * masasAuxiliar[otro_cuerpo] * dj / ((ndj)**3.0)
                 aceleraciones[i] = aceleraciones[i] + term
-                # cuerpo_actual.acel = cuerpo_actual.acel+term
-        
+              
         for cuerpo_actual in range(len(cuerpos)):
             posiciones[cuerpo_actual] = posiciones[cuerpo_actual] + velocidades[cuerpo_actual] * Dt + 0.5 *aceleraciones[cuerpo_actual]*Dt**2
-            # cuerpo_actual.pos = cuerpo_actual.pos + cuerpo_actual.vel * Dt + 0.5 * cuerpo_actual.acel*Dt**2    #Como las posicicones estan dadas por la matriz [pos] esta ecuacion sirvepara calcular todas las posiciones"""
-
+            
         posi = np.array(obtener_posicion_de_cuerpos()) #necesario de modificar +1
+        pl2,= ax.plot(np.array(posi)[:,0], np.array(posi)[:,1],'bo')
         pl1.set_data(posi[:,0],posi[:,1])
+        pl1,= ax.plot(np.array(posi)[:,0], np.array(posi)[:,1],'ro')
         #Para cada cuerpo me mostrara una "linea"
-
-        plt.title(t)
+        string = "N-bodysim\nTiempo:" + str(t)
+        plt.title(string, fontsize=19)
         plt.pause(0.01)
         t += 1
 
     plt.show()
-
-
-if __name__ == "__main__":
-    core()
