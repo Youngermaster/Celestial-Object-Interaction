@@ -111,7 +111,7 @@ def core():
     ax.set_xlim(min(np.array(posi)[:,0])-inx*LIMITE_DE_GRAFICACION,max(np.array(posi)[:,0])+inx*LIMITE_DE_GRAFICACION)
     ax.set_ylim(min(np.array(posi)[:,1])-iny*LIMITE_DE_GRAFICACION, max(np.array(posi)[:,1])+iny*LIMITE_DE_GRAFICACION)
 
-    masas[0] = 5000000
+    masas[0] = 5000
     while iteraciones < 400:
         # En el siguiente código lo que hacemos es comparar cada cuerpo
         # con todos los demás.
@@ -125,10 +125,10 @@ def core():
             masasAuxiliar.pop(i)
 
             for otro_cuerpo in range(len(posicionesAuxiliar)):
-                dj = posicionesAuxiliar[otro_cuerpo] - posiciones[i]
-                ndj = np.linalg.norm(dj) #Norma del vector entre la interaccion con cada cuerpo"""
+                distancia = posicionesAuxiliar[otro_cuerpo] - posiciones[i]
+                normaDeDistancia = np.linalg.norm(distancia) # Norma del vector entre la interaccion con cada cuerpo
 
-                term = CONSTANTE_G * masasAuxiliar[otro_cuerpo] * dj / ((ndj)**3.0)
+                term = CONSTANTE_G * masasAuxiliar[otro_cuerpo] * distancia / ((normaDeDistancia)**3.0)
                 aceleraciones[i] = aceleraciones[i] + term
 
         # Actualizamos las posiciones de todos los cuerpos
@@ -139,11 +139,20 @@ def core():
         # Actualizamos la variable posi, con los nuevos valores de las posiciones.
         posi = np.array(obtener_posicion_de_cuerpos())
 
-        # Gráficamos los cuerpos y su trayectoria
-        trayectoria, = ax.plot(np.array(posi)[:, 0], np.array(posi)[:, 1], 'bo')#, markersize = 20)
-        cuerpo.set_data(posi[:,0],posi[:,1])
-        cuerpo, = ax.plot(np.array(posi)[:,0], np.array(posi)[:,1], 'ro')#, markersize = )
+        GRADO_DE_PROPORCION = 2
+        masasProporcionales = [x / GRADO_DE_PROPORCION for x in masas]
 
+        # Gráficamos los cuerpos y su trayectoria
+        
+        # Trayectoria
+        plt.scatter(np.array(posi)[:,0], np.array(posi)[:,1], s=masasProporcionales, c='lightblue')
+        # Gráficamos los cuerpos
+        cuerpo.set_data(posi[:,0],posi[:,1])
+        #trayectoria, = ax.plot(np.array(posi)[:, 0], np.array(posi)[:, 1], 'bo')
+        #cuerpo, = ax.plot(np.array(posi)[:,0], np.array(posi)[:,1], 'ro')
+        
+
+        #cuerpo, = ax.scatter(np.array(posi)[:,0], np.array(posi)[:,1], s=masas)
         titulo = "N-bodysim\nTiempo:" + str(iteraciones)
         plt.title(titulo, fontsize=19)
         plt.pause(0.01)
