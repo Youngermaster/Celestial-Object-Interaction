@@ -63,6 +63,11 @@ def generador_de_cuerpos(cantidadDeCuerpos):
 def obtener_posicion_de_cuerpos():
     return posiciones
 
+"""
+    Una prueba 
+def movimiento_uniformemente_acelerado(velocidadFinal, velocidadInicial, aceleracion, tiempo):
+    velocidadFinal = velocidadInicial + (aceleracion * tiempo)
+"""
 
 """
     Esta función se encarga de varias tareas, entre ellas:
@@ -76,12 +81,12 @@ def obtener_posicion_de_cuerpos():
           como lo hemos hecho con todas la demás funciones anteriores, sin embargo, por
           casos prácticos se han juntado estas tres tareas.
 """
-def core():
+def core(logger, trayectoria):
     cantidadDeCuerpos = pedir_datos("¿Cuántos cuerpos deseas?\n", "int")
     LIMITE_DE_GRAFICACION = pedir_datos("Dame una escala de graficación, por favor\n", "float")
     generador_de_cuerpos(cantidadDeCuerpos)
     
-    CONSTANTE_G = 0.4  # 0.4<CONSTANTE_G<0.5
+    CONSTANTE_GRAVITACIONAL = 0.4  # 0.4<CONSTANTE_GRAVITACIONAL<0.5
     DELTA_T = 0.01
     posi = np.array(obtener_posicion_de_cuerpos())
     iteraciones = 0 
@@ -97,7 +102,6 @@ def core():
     # Mi grafica tendra un eje coordenado que se define como 'ax' y
     # grafica los cuerpos mostrándolos todos en la posicion X con [:,0]
     # y en la posicion Y [:,1]
-    cuerpo, = ax.plot(np.array(posi)[:, 0], np.array(posi)[:, 1], 'go')
     
     # Definimos el tamaño del recuadro en el que queremos que aparezcan
     # nuestros Cuerpos cogiendo nuestra posición más lejana y
@@ -105,14 +109,20 @@ def core():
     inx = max(np.array(posi)[:,0])-min(np.array(posi)[:,0])
     iny = max(np.array(posi)[:,1])-min(np.array(posi)[:,1])  
 
-
+    cuerpo, = ax.plot(np.array(posi)[:,0], np.array(posi)[:,1], 'mo')
     # Definimos los limites de graficacion.
     
     ax.set_xlim(min(np.array(posi)[:,0])-inx*LIMITE_DE_GRAFICACION,max(np.array(posi)[:,0])+inx*LIMITE_DE_GRAFICACION)
     ax.set_ylim(min(np.array(posi)[:,1])-iny*LIMITE_DE_GRAFICACION, max(np.array(posi)[:,1])+iny*LIMITE_DE_GRAFICACION)
 
-    masas[0] = 5000
-    while iteraciones < 400:
+    if logger:
+        print("Posiciones inicial:\n")
+        print(posiciones)
+        print("Velocidades inicial:\n")
+        print(velocidades)
+
+    masas[0] = 500
+    while iteraciones < 100:
         # En el siguiente código lo que hacemos es comparar cada cuerpo
         # con todos los demás.
         for i in range(len(posiciones)):
@@ -120,7 +130,7 @@ def core():
             aceleracionesAuxiliar = aceleraciones.copy()
             masasAuxiliar = masas.copy()
 
-            posicionesAuxiliar.pop(i)
+            posicionesAuxiliar.pop(i)# [1, 2, 3, 4]
             aceleracionesAuxiliar.pop(i)
             masasAuxiliar.pop(i)
 
@@ -128,34 +138,39 @@ def core():
                 distancia = posicionesAuxiliar[otro_cuerpo] - posiciones[i]
                 normaDeDistancia = np.linalg.norm(distancia) # Norma del vector entre la interaccion con cada cuerpo
 
-                term = CONSTANTE_G * masasAuxiliar[otro_cuerpo] * distancia / ((normaDeDistancia)**3.0)
-                aceleraciones[i] = aceleraciones[i] + term
+                term = CONSTANTE_GRAVITACIONAL * masasAuxiliar[otro_cuerpo] * masas[i] * distancia / ((normaDeDistancia)**3.0)
+                aceleraciones[i] += term
+                if logger:
+                    print("\nFuerzas Cuerpo ", otro_cuerpo, ": ")
+                    print(term, "\n")
 
         # Actualizamos las posiciones de todos los cuerpos
         # dependiendo de su interacción.
         for cuerpo_actual in range(len(posiciones)):
-            posiciones[cuerpo_actual] = posiciones[cuerpo_actual] + velocidades[cuerpo_actual] * DELTA_T + 0.5 *aceleraciones[cuerpo_actual]*DELTA_T**2
-        
+            posiciones[cuerpo_actual] += velocidades[cuerpo_actual] * DELTA_T + 0.5 *aceleraciones[cuerpo_actual]*DELTA_T**2
+            velocidades[cuerpo_actual] += (aceleraciones[cuerpo_actual] * DELTA_T)
+
         # Actualizamos la variable posi, con los nuevos valores de las posiciones.
         posi = np.array(obtener_posicion_de_cuerpos())
-
-        GRADO_DE_PROPORCION = 2
-        masasProporcionales = [x / GRADO_DE_PROPORCION for x in masas]
-
         # Gráficamos los cuerpos y su trayectoria
-        
-        # Trayectoria
-        plt.scatter(np.array(posi)[:,0], np.array(posi)[:,1], s=masasProporcionales, c='lightblue')
-        # Gráficamos los cuerpos
-        cuerpo.set_data(posi[:,0],posi[:,1])
-        #trayectoria, = ax.plot(np.array(posi)[:, 0], np.array(posi)[:, 1], 'bo')
-        #cuerpo, = ax.plot(np.array(posi)[:,0], np.array(posi)[:,1], 'ro')
-        
 
-        #cuerpo, = ax.scatter(np.array(posi)[:,0], np.array(posi)[:,1], s=masas)
+        # Trayectoria
+        if trayectoria:
+            trayectoria, = ax.plot(np.array(posi)[:, 0], np.array(posi)[:, 1], 'co')
+            cuerpo.set_data(posi[:,0],posi[:,1])
+            cuerpo, = ax.plot(np.array(posi)[:,0], np.array(posi)[:,1], 'mo')
+        else:
+            cuerpo.set_data(posi[:,0],posi[:,1])
+
         titulo = "N-bodysim\nTiempo:" + str(iteraciones)
         plt.title(titulo, fontsize=19)
         plt.pause(0.01)
         iteraciones += 1
 
+    if logger:
+        print("\nPosiciones final:\n")
+        print(posiciones)
+        print("\nVelocidades final:\n")
+        print(velocidades)
+        
     plt.show()
