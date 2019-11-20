@@ -64,12 +64,6 @@ def obtener_posicion_de_cuerpos():
     return posiciones
 
 """
-    Una prueba 
-def movimiento_uniformemente_acelerado(velocidadFinal, velocidadInicial, aceleracion, tiempo):
-    velocidadFinal = velocidadInicial + (aceleracion * tiempo)
-"""
-
-"""
     Esta función se encarga de varias tareas, entre ellas:
 
     - Pedir los datos necesarios para gráficar.
@@ -122,6 +116,7 @@ def core(logger, trayectoria):
         print(velocidades)
 
     masas[0] = 500
+    posiciones[0] = np.array([0.0, 0.0])
     while iteraciones < 100:
         # En el siguiente código lo que hacemos es comparar cada cuerpo
         # con todos los demás.
