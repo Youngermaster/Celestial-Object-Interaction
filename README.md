@@ -4,7 +4,7 @@ This project make a simulator of the interaction of n (a natural number given) b
 
 ## Preview
 
-- TODO: add the ![bodyInteraction.gif](assets/images/animation.gif)
+![bodyInteraction.gif](assets/images/animation.gif)
 
 ## How to execute it?
 
