@@ -1,6 +1,10 @@
-# Body-Interaction
+# Celestial Body Interaction
 
 This project make a simulator of the interaction of n (a natural number given) bodies in a 2D space.
+
+## Preview
+
+- TODO: add the ![bodyInteraction.gif](assets/images/animation.gif)
 
 ## How to execute it?
 
@@ -25,10 +29,3 @@ There are two boolean flags:
 
         if __name__ == "__main__":
             core(True, True) # You can change these boolean flags
-
-
-
-## Preview
-
-
-- TODO: add the ![bodyInteraction.gif](assets/images/bodyInteraction.gif)
